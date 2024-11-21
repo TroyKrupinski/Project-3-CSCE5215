@@ -97,15 +97,48 @@ gas_gauge_probs = G.nodes["gas_gauge"]
 car_wont_start_probs = G.nodes["car_wont_start"]
 dipstick_low_probs = G.nodes["dipstick_low"]
 
+'''
+P(B|+j, +m) =
+
+P(B, e, a, +j, +m)
+    P(+j, +m)
+    Let us take P(B, e, a, +j, +m).
+        Now P(B, e, a, +j, +m) = ∑e,a P(B, e, a, +j, +m) = ∑ P(B) × P(e) × P(a|B, e) × P(+j|a) × P(+m|a) e,a
+        = P(B) × P(+e) × P(+a|B, +e) × P(+j|+a) × P(+m|+a) + P(B) × P(+e) × P(−a|B, +e) × P(+j|−a) ×
+        P(+m|−a) + P(B) × P(−e) × P(+a|B, −e) × P(+j|+a) × P(+m|+a) + P(B) × P(−e) × P(−a|B, −e) ×
+        P(+j|−a) × P(+m|−a)
+'''
+
 def car_fanbelt(G):
     # P(+cws|+fb) = P(+cws,+fb) / P(+fb)
     # P(+cws,+fb) = P(+cws|+fb) * P(+fb)
     # P(+cws) = P(+cws,+fb) + P(+cws,-fb)
-    return                
+    fb_y = G.nodes["fanbelt_broken"]["fb_y"] # P(+fb)
+    fb_n = G.nodes["fanbelt_broken"]["fb_n"] # P(-fb)
 
+    ab_y_fb_y_nc_y = G.nodes["no_charging_table"]["ab_y_fb_y_nc_y"] # P(+No Charging Table | +Alternator, +Fanbelt)
+    ab_y_fb_n_nc_y = G.nodes["no_charging_table"]["ab_y_fb_n_nc_y"] # P(+No Charging Table | +Alternator, -Fanbelt)
+    ab_n_fb_y_nc_y = G.nodes["no_charging_table"]["ab_n_fb_y_nc_y"] # P(+No Charging Table | -Alternator, +Fanbelt)
+    ab_n_fb_n_nc_y = G.nodes["no_charging_table"]["ab_n_fb_n_nc_y"] # P(+No Charging Table | -Alternator, -Fanbelt)
+     
+        # Compute P(nc_y | +fb)
+    p_nc_y_given_fb = (
+        ab_y_fb_y_nc_y * G.nodes["alternator_broken"]["ab_y"] +
+        ab_n_fb_y_nc_y * G.nodes["alternator_broken"]["ab_n"]
+    )
 
+    # Compute P(+cws | +fb)
+    p_cws_given_fb = (
+        G.nodes["car_wont_start"]["bf_y_no_y_cs_y"] * fb_y * p_nc_y_given_fb
+    )
+
+    # Return the computed probability
+    return p_cws_given_fb
+
+    
 
 print("p(+cws|+fb)")
-car_fanbelt(G)  
+R2 = car_fanbelt(G)
+print(f"P(+cws | +fb): {R2}")
 
 print(G.nodes())
