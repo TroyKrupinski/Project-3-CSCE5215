@@ -1,0 +1,18 @@
+Troy Krupinski
+tsk0064
+
+R5:
+
+P(+car_won't_start|+fanbelt_broken) = 0.3468 (34.68%)
+
+P(+car_won't_start|+battery_age) = 0.3264 (32.64%)
+
+
+They also share a common node - which is battery flat, so probably checking the battery FIRST would be best regarding diagnosing the issue. 
+
+Given P(+cws|+fb) is 34.68%, which is higher than P(+cws|+ba) by 2% - checking the fanbelt first would make since probability wise. However both should be checked as they both have moderate probabilities, and that these probabilities give us the insight that neither the battery age or the fact that the fanbelt is broken is highly deterministic of failure - and that other factors should be considered. 
+
+And regarding independence - the combined effect of both faults is less than the sum of individual probabilities, meaning they are not completely independent hence - if the battery is already flat due to age, a broken fan belt's effect on charging becomes less relevant, and if the fan belt has caused charging issues, the battery's age becomes less significant.
+
+This redundancy explains why adding probabilities overestimates the combined effect. Also, fixing one issue might partially address the other due to this - though the issue it addresses will most likely have to be repaired in the future.
+
